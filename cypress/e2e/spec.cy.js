@@ -1,38 +1,65 @@
 /// <reference types= "cypress" />
-
 Cypress.on("uncaught:exception", (err, runnable) => {
   // returning false here prevents Cypress from
   // failing the test
   return false;
 });
 
-describe("template spec", () => {
-  it("Randomly enter the website arabic or english", () => {
-    let websites = [
+Cypress.Commands.add("visiturl", () => {
+  let Websites = [
+    "https://global.almosafer.com/ar",
+    "https://global.almosafer.com/en",
+  ];
+
+  let RandomIndex = Math.floor(Math.random() * Websites.length);
+  cy.visit(Websites[RandomIndex]);
+
+  cy.get(".cta__saudi").click();
+});
+
+describe("Aspire Test cases ", () => {
+  const TheDate = new Date();
+
+  const today_date = TheDate.getDate();
+  const expectedDepatureDate = today_date + 1;
+  const expectedreturnDate = today_date + 2;
+
+  console.log(TheDate);
+
+  it.skip("Randomly enter the website arabic or english ", () => {
+    let Websites = [
       "https://global.almosafer.com/ar",
       "https://global.almosafer.com/en",
     ];
 
-    let randomIndex = Math.floor(Math.random() * websites.length);
-
-    cy.visit(websites[randomIndex]);
+    let RandomIndex = Math.floor(Math.random() * Websites.length);
+    cy.visit(Websites[RandomIndex]);
 
     let ArabicCities = ["جدة", "دبي"];
-    let ArabicRandomeIndex = Math.floor(Math.random()) * ArabicCities.length;
-    let EnglishCities = ["dubai", "jaddah", "riyad"];
-    let EnglishRandomeIndex = Math.floor(Math.random()) * EnglishCities.length;
+    let ArabicRandomIndex = Math.floor(Math.random() * ArabicCities.length);
+    let englishCities = ["riyadh", "dubai", "jeddah"];
+    let EnglishRandomIndex = Math.floor(Math.random() * englishCities.length);
 
     cy.get(".cta__saudi").click();
-    cy.get("#uncontrolled-tab-example-tab-hotels > .sc-dWcDbm").click();
-
-    if (randomIndex == 0) {
+    cy.get("#uncontrolled-tab-example-tab-hotels").click();
+    if (RandomIndex == 0) {
       cy.get('[data-testid="AutoCompleteInput"]').type(
-        ArabicCities[ArabicRandomeIndex]
+        ArabicCities[ArabicRandomIndex]
       );
-    } else { 
+    } else {
       cy.get('[data-testid="AutoCompleteInput"]').type(
-        EnglishCities[EnglishRandomeIndex]
+        englishCities[EnglishRandomIndex]
       );
     }
+  });
+
+  it("test the depature date + the return date ", () => {
+    cy.visiturl();
+
+    cy.get('[data-testid="FlightSearchBox__FromDateButton"] > .sc-eSePXt')
+      .invoke("text")
+      .then((elementText) => {
+        expect(expectedDepatureDate).to.eql(parseInt(elementText.trim()));
+      });
   });
 });
